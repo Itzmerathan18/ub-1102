@@ -3,24 +3,40 @@ import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/lib/auth-context';
 import { useLang, type Lang } from '@/lib/language-context';
 import { useTheme } from '@/lib/theme-context';
-import { Bell, Sun, Moon } from 'lucide-react';
+import { Bell, Sun, Moon, Loader2 } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { getAlerts } from '@/lib/api';
+import { useRouter } from 'next/navigation';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { user } = useAuth();
+    const { user, isLoading } = useAuth();
+    const router = useRouter();
     const { lang, setLang, t } = useLang();
     const { theme, toggleTheme } = useTheme();
     const [alertCount, setAlertCount] = useState(0);
 
     useEffect(() => {
-        getAlerts().then(res => {
-            const unread = (res.data || []).filter((a: any) => !a.isRead).length;
-            setAlertCount(unread);
-        }).catch(() => { });
-    }, []);
+        if (!isLoading && !user) {
+            router.push('/login');
+        }
+    }, [user, isLoading, router]);
 
-    if (!user) return null;
+    useEffect(() => {
+        if (user) {
+            getAlerts().then(res => {
+                const unread = (res.data || []).filter((a: any) => !a.isRead).length;
+                setAlertCount(unread);
+            }).catch(() => { });
+        }
+    }, [user]);
+
+    if (isLoading || !user) {
+        return (
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#060d1a' }}>
+                <Loader2 size={40} className="animate-spin text-green-500" />
+            </div>
+        );
+    }
 
     return (
         <div className="app-layout">
