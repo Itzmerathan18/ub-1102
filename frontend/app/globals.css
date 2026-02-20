@@ -36,6 +36,83 @@
   --sidebar-width: 260px;
 }
 
+/* ===== LIGHT THEME ===== */
+[data-theme="light"] {
+  --bg-primary: #f5f7fa;
+  --bg-secondary: #edf0f5;
+  --bg-card: #ffffff;
+  --bg-card-hover: #f8fafb;
+  --border-color: #dde3ec;
+  --border-glow: rgba(22, 163, 74, 0.3);
+  --text-primary: #111827;
+  --text-secondary: #4b5563;
+  --text-muted: #9ca3af;
+}
+
+[data-theme="light"] .sidebar {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafb 100%) !important;
+  border-right-color: #dde3ec !important;
+}
+
+[data-theme="light"] .top-header {
+  background: rgba(255, 255, 255, 0.92) !important;
+  border-bottom-color: #dde3ec !important;
+}
+
+[data-theme="light"] .glass-card {
+  background: rgba(255, 255, 255, 0.9) !important;
+}
+
+[data-theme="light"] .metric-card {
+  background: linear-gradient(135deg, #ffffff, #f8fafb) !important;
+}
+
+[data-theme="light"] .modal-box {
+  background: #ffffff !important;
+}
+
+[data-theme="light"] .input-field {
+  background: #f5f7fa !important;
+}
+
+[data-theme="light"] select.input-field option {
+  background: #ffffff;
+}
+
+[data-theme="light"] .tab-bar {
+  background: rgba(237, 240, 245, 0.8) !important;
+}
+
+[data-theme="light"] .question-option {
+  background: rgba(245, 247, 250, 0.8) !important;
+}
+
+[data-theme="light"] .lang-select {
+  background: #f5f7fa !important;
+  color: #111827 !important;
+}
+
+[data-theme="light"] .btn-secondary {
+  background: rgba(237, 240, 245, 0.9) !important;
+  color: #4b5563 !important;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-track {
+  background: #edf0f5;
+}
+
+[data-theme="light"] ::-webkit-scrollbar-thumb {
+  background: #c4cdd8;
+}
+
+[data-theme="light"] .action-card-ayurveda {
+  background: linear-gradient(135deg, rgba(22, 163, 74, 0.06) 0%, rgba(217, 119, 6, 0.03) 100%) !important;
+}
+
+[data-theme="light"] .action-card-medicine {
+  background: linear-gradient(135deg, rgba(29, 78, 216, 0.06) 0%, rgba(96, 165, 250, 0.03) 100%) !important;
+}
+
 * {
   box-sizing: border-box;
   margin: 0;
@@ -120,64 +197,150 @@ body {
   flex-direction: column;
 }
 
+.sidebar-header {
+  padding: 0;
+}
+
 .sidebar-logo {
-  padding: 24px 20px;
-  border-bottom: 1px solid var(--border-color);
-}
-
-.sidebar-section-label {
-  padding: 16px 20px 6px;
-  font-size: 10px;
-  font-weight: 700;
-  letter-spacing: 2px;
-  text-transform: uppercase;
-  color: var(--text-muted);
-}
-
-.sidebar-nav-item {
   display: flex;
   align-items: center;
   gap: 12px;
-  padding: 11px 16px;
-  margin: 2px 8px;
+  padding: 20px 18px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.logo-icon {
+  font-size: 28px;
+}
+
+.logo-title {
+  font-size: 20px;
+  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  background: linear-gradient(135deg, var(--green-light), var(--gold-light));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.logo-subtitle {
+  font-size: 10px;
+  color: var(--text-muted);
+  letter-spacing: 0.5px;
+}
+
+.sidebar-nav {
+  flex: 1;
+  padding: 12px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
   border-radius: 10px;
   color: var(--text-secondary);
-  font-size: 14px;
+  font-size: 13px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
   text-decoration: none;
+  border: 1px solid transparent;
 }
 
-.sidebar-nav-item:hover {
+.nav-item:hover {
   background: rgba(22, 163, 74, 0.07);
   color: var(--green-light);
 }
 
-.sidebar-nav-item.active {
+.nav-item.active {
   background: linear-gradient(135deg, rgba(22, 163, 74, 0.15), rgba(29, 78, 216, 0.1));
   color: var(--green-light);
-  border: 1px solid rgba(22, 163, 74, 0.2);
+  border-color: rgba(22, 163, 74, 0.2);
 }
 
-.sidebar-nav-item.ayurveda-active {
-  background: rgba(22, 163, 74, 0.12);
-  color: var(--green-light);
-  border: 1px solid rgba(22, 163, 74, 0.2);
+.sidebar-footer {
+  padding: 12px 14px;
+  border-top: 1px solid var(--border-color);
 }
 
-.sidebar-nav-item.medicine-active {
-  background: rgba(29, 78, 216, 0.12);
-  color: var(--blue-light);
-  border: 1px solid rgba(29, 78, 216, 0.2);
+.user-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.user-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, var(--green-ayurveda), var(--blue-medicine));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  font-weight: 700;
+  color: white;
+  flex-shrink: 0;
+}
+
+.user-details {
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.user-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.user-email {
+  font-size: 11px;
+  color: var(--text-muted);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  width: 100%;
+  padding: 8px 12px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-weight: 500;
+  cursor: pointer;
+  border: none;
+  background: rgba(244, 63, 94, 0.08);
+  color: #f43f5e;
+  transition: all 0.2s;
+}
+
+.logout-btn:hover {
+  background: rgba(244, 63, 94, 0.15);
 }
 
 /* ===== LAYOUT ===== */
-.main-layout {
-  margin-left: var(--sidebar-width);
+.app-layout {
+  display: flex;
   min-height: 100vh;
+}
+
+.main-panel {
+  margin-left: var(--sidebar-width);
+  flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 100vh;
 }
 
 .main-content {
@@ -191,7 +354,7 @@ body {
   background: rgba(6, 13, 26, 0.92);
   backdrop-filter: blur(16px);
   border-bottom: 1px solid var(--border-color);
-  padding: 14px 36px;
+  padding: 12px 36px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -200,35 +363,99 @@ body {
   z-index: 40;
 }
 
-/* Language switcher */
-.lang-switcher {
+.header-left {
   display: flex;
-  gap: 4px;
-  background: rgba(15, 28, 48, 0.8);
-  border: 1px solid var(--border-color);
-  border-radius: 10px;
-  padding: 4px;
+  align-items: center;
 }
 
-.lang-btn {
-  padding: 5px 12px;
-  border-radius: 7px;
-  font-size: 12px;
-  font-weight: 600;
+.header-brand {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  color: var(--text-secondary);
+}
+
+.header-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.lang-select {
+  appearance: none;
+  background: rgba(15, 28, 48, 0.8);
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  padding: 6px 28px 6px 10px;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-primary);
   cursor: pointer;
-  border: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%2394aec8' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 8px center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.lang-select:focus {
+  border-color: var(--accent-green);
+}
+
+.theme-toggle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
   background: transparent;
-  color: var(--text-muted);
+  color: var(--text-secondary);
+  cursor: pointer;
   transition: all 0.2s;
 }
 
-.lang-btn.active {
-  background: linear-gradient(135deg, var(--green-ayurveda), var(--blue-medicine));
-  color: white;
+.theme-toggle:hover {
+  border-color: var(--accent-gold);
+  color: var(--gold-light);
+  background: rgba(217, 119, 6, 0.08);
 }
 
-.lang-btn:hover:not(.active) {
-  color: var(--text-primary);
+.alert-bell {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  text-decoration: none;
+}
+
+.alert-bell:hover {
+  border-color: var(--accent-blue);
+  color: var(--blue-light);
+}
+
+.alert-badge {
+  position: absolute;
+  top: -4px;
+  right: -4px;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: var(--accent-rose);
+  color: white;
+  font-size: 10px;
+  font-weight: 700;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 /* ===== METRIC / FEATURE CARDS ===== */
@@ -272,6 +499,23 @@ body {
 }
 
 /* ===== ACTION CARDS (Dashboard) ===== */
+.action-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 16px;
+  padding: 24px;
+  cursor: pointer;
+  transition: all 0.3s;
+  text-decoration: none;
+  display: block;
+}
+
+.action-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0, 0, 0, 0.15);
+  border-color: var(--border-glow);
+}
+
 .action-card-ayurveda {
   background: linear-gradient(135deg, rgba(22, 163, 74, 0.12) 0%, rgba(217, 119, 6, 0.06) 100%);
   border: 1px solid rgba(22, 163, 74, 0.25);
@@ -279,6 +523,8 @@ body {
   padding: 32px;
   cursor: pointer;
   transition: all 0.3s;
+  text-decoration: none;
+  display: block;
 }
 
 .action-card-ayurveda:hover {
@@ -294,12 +540,46 @@ body {
   padding: 32px;
   cursor: pointer;
   transition: all 0.3s;
+  text-decoration: none;
+  display: block;
 }
 
 .action-card-medicine:hover {
   transform: translateY(-4px);
   box-shadow: 0 16px 48px rgba(29, 78, 216, 0.15);
   border-color: rgba(29, 78, 216, 0.5);
+}
+
+/* ===== STAT CARD ===== */
+.stat-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px 22px;
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.stat-card .stat-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.stat-card .stat-value {
+  font-size: 26px;
+  font-weight: 800;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+}
+
+.stat-card .stat-label {
+  font-size: 12px;
+  color: var(--text-muted);
+  font-weight: 500;
 }
 
 /* ===== BUTTONS ===== */
@@ -431,6 +711,30 @@ body {
 
 select.input-field option {
   background: #0b1426;
+}
+
+textarea.input-field {
+  resize: vertical;
+  min-height: 80px;
+}
+
+/* ===== FORM ===== */
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-label {
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 14px;
 }
 
 /* ===== ASSESSMENT QUESTION CARD ===== */
@@ -777,6 +1081,10 @@ select.input-field option {
   .grid-2 {
     grid-template-columns: 1fr;
   }
+
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 640px) {
@@ -836,4 +1144,62 @@ select.input-field option {
   border: 1.5px solid rgba(29, 78, 216, 0.3);
   border-radius: 20px;
   padding: 28px;
+}
+
+/* ===== RECORD CARD ===== */
+.record-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 18px;
+  margin-bottom: 12px;
+  transition: border-color 0.2s;
+}
+
+.record-card:hover {
+  border-color: var(--border-glow);
+}
+
+/* ===== ALERT CARD ===== */
+.alert-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 14px;
+  padding: 16px 20px;
+  margin-bottom: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  transition: all 0.2s;
+}
+
+.alert-card.unread {
+  border-left: 3px solid var(--accent-blue);
+}
+
+.alert-card.severity-critical {
+  border-left-color: var(--accent-rose);
+}
+
+.alert-card.severity-warning {
+  border-left-color: var(--gold-accent);
+}
+
+/* ===== SECTION CARD ===== */
+.section-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border-color);
+  border-radius: 18px;
+  padding: 24px;
+  margin-bottom: 20px;
+}
+
+.section-card h3 {
+  font-size: 16px;
+  font-weight: 700;
+  font-family: 'Plus Jakarta Sans', sans-serif;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
 }

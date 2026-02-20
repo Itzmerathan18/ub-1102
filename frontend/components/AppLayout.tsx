@@ -1,52 +1,59 @@
 'use client';
-import { useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/lib/auth-context';
-import { useLang } from '@/lib/language-context';
-import Sidebar from './Sidebar';
+import { useLang, type Lang } from '@/lib/language-context';
+import { useTheme } from '@/lib/theme-context';
+import { Bell, Sun, Moon } from 'lucide-react';
+import { useEffect, useState } from 'react';
+import { getAlerts } from '@/lib/api';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
-    const { token, isLoading } = useAuth();
-    const { lang, setLang } = useLang();
-    const router = useRouter();
+    const { user } = useAuth();
+    const { lang, setLang, t } = useLang();
+    const { theme, toggleTheme } = useTheme();
+    const [alertCount, setAlertCount] = useState(0);
 
     useEffect(() => {
-        if (!isLoading && !token) router.push('/login');
-    }, [token, isLoading]);
+        getAlerts().then(res => {
+            const unread = (res.data || []).filter((a: any) => !a.isRead).length;
+            setAlertCount(unread);
+        }).catch(() => { });
+    }, []);
 
-    if (isLoading) {
-        return (
-            <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', minHeight: '100vh', background: '#060d1a' }}>
-                <div style={{ textAlign: 'center' }}>
-                    <div className="spinner" style={{ width: 40, height: 40, margin: '0 auto 16px', borderWidth: 3 }} />
-                    <div style={{ color: '#475569', fontSize: 14 }}>Loading Jeevaloom...</div>
-                </div>
-            </div>
-        );
-    }
-
-    if (!token) return null;
+    if (!user) return null;
 
     return (
-        <div style={{ display: 'flex', minHeight: '100vh' }}>
+        <div className="app-layout">
             <Sidebar />
-            <div className="main-layout">
-                {/* Header */}
+            <div className="main-panel">
                 <header className="top-header">
-                    <div style={{ fontSize: 13, color: '#4a6480', fontWeight: 500 }}>
-                        🌿 Jeevaloom — Your Integrative Health Platform
+                    <div className="header-left">
+                        <h2 className="header-brand">Jeevaloom</h2>
                     </div>
-                    <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-                        <div className="lang-switcher">
-                            {(['en', 'hi', 'kn'] as const).map(l => (
-                                <button key={l} className={`lang-btn ${lang === l ? 'active' : ''}`} onClick={() => setLang(l)}>
-                                    {l === 'en' ? 'EN' : l === 'hi' ? 'हि' : 'ಕ'}
-                                </button>
-                            ))}
-                        </div>
+                    <div className="header-right">
+                        {/* Language Dropdown */}
+                        <select
+                            className="lang-select"
+                            value={lang}
+                            onChange={(e) => setLang(e.target.value as Lang)}
+                        >
+                            <option value="en">🌐 English</option>
+                            <option value="hi">🌐 हिंदी</option>
+                            <option value="kn">🌐 ಕನ್ನಡ</option>
+                        </select>
+
+                        {/* Theme Toggle */}
+                        <button className="theme-toggle" onClick={toggleTheme} title={theme === 'dark' ? t('light_mode') : t('dark_mode')}>
+                            {theme === 'dark' ? <Sun size={18} /> : <Moon size={18} />}
+                        </button>
+
+                        {/* Alerts Bell */}
+                        <a href="/alerts" className="alert-bell">
+                            <Bell size={18} />
+                            {alertCount > 0 && <span className="alert-badge">{alertCount}</span>}
+                        </a>
                     </div>
                 </header>
-
                 <main className="main-content">
                     {children}
                 </main>

@@ -7,13 +7,11 @@ const router = express.Router();
 // POST /caretakers/invite
 router.post('/invite', authMiddleware, async (req, res) => {
     try {
-        const { caretakerPhone, relationship, canEditMedications, canUploadReports, canEditProfile } = req.body;
+        const { caretakerEmail, relationship, canEditMedications, canUploadReports, canEditProfile } = req.body;
 
-        let caretakerUser = await prisma.user.findUnique({ where: { phoneNumber: caretakerPhone } });
+        let caretakerUser = await prisma.user.findUnique({ where: { email: caretakerEmail } });
         if (!caretakerUser) {
-            caretakerUser = await prisma.user.create({
-                data: { phoneNumber: caretakerPhone, role: 'caretaker' },
-            });
+            return res.status(404).json({ error: 'No user found with that email. They must register first.' });
         }
 
         const existing = await prisma.caretaker.findFirst({
@@ -38,12 +36,12 @@ router.post('/invite', authMiddleware, async (req, res) => {
     }
 });
 
-// GET /caretakers - list caretakers for current patient
+// GET /caretakers
 router.get('/', authMiddleware, async (req, res) => {
     try {
         const caretakers = await prisma.caretaker.findMany({
             where: { patientId: req.user.id },
-            include: { caretaker: { select: { phoneNumber: true, email: true } } },
+            include: { caretaker: { select: { email: true, name: true } } },
         });
         res.json(caretakers);
     } catch (err) {

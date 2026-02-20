@@ -7,6 +7,13 @@ require('dotenv').config();
 const authRoutes = require('./routes/auth');
 const assessmentRoutes = require('./routes/assessments');
 const prescriptionRoutes = require('./routes/prescriptions');
+const profileRoutes = require('./routes/profile');
+const medicationRoutes = require('./routes/medications');
+const reportRoutes = require('./routes/reports');
+const alertRoutes = require('./routes/alerts');
+const caretakerRoutes = require('./routes/caretakers');
+const qrRoutes = require('./routes/qr');
+const emergencyRoutes = require('./routes/emergency');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -29,6 +36,13 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/assessments', assessmentRoutes);
 app.use('/prescriptions', prescriptionRoutes);
+app.use('/profile', profileRoutes);
+app.use('/medications', medicationRoutes);
+app.use('/reports', reportRoutes);
+app.use('/alerts', alertRoutes);
+app.use('/caretakers', caretakerRoutes);
+app.use('/qr', qrRoutes);
+app.use('/emergency', emergencyRoutes);
 
 app.use((req, res) => res.status(404).json({ error: 'Route not found' }));
 app.use((err, req, res, next) => {

@@ -1,82 +1,69 @@
 'use client';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
-import JeevaloomLogo from './JeevaloomLogo';
-import {
-    LayoutDashboard, Leaf, Stethoscope, History,
-    User, LogOut
-} from 'lucide-react';
+import { LayoutDashboard, Leaf, Stethoscope, Pill, FolderHeart, History, QrCode, Users, User, LogOut } from 'lucide-react';
 
 export default function Sidebar() {
     const pathname = usePathname();
+    const router = useRouter();
     const { user, logout } = useAuth();
     const { t } = useLang();
 
     const navItems = [
-        { href: '/dashboard', label: t('dashboard'), icon: LayoutDashboard },
-        { href: '/ayurveda', label: t('ayurveda'), icon: Leaf, activeClass: 'ayurveda-active' },
-        { href: '/english-medicine', label: t('english_medicine'), icon: Stethoscope, activeClass: 'medicine-active' },
-        { href: '/history', label: t('history'), icon: History },
-        { href: '/profile', label: t('profile'), icon: User },
+        { href: '/dashboard', icon: LayoutDashboard, label: t('dashboard') },
+        { href: '/ayurveda', icon: Leaf, label: t('ayurveda') },
+        { href: '/english-medicine', icon: Stethoscope, label: t('english_medicine') },
+        { href: '/medications', icon: Pill, label: t('medications') },
+        { href: '/vault', icon: FolderHeart, label: t('medical_records') },
+        { href: '/history', icon: History, label: t('history') },
+        { href: '/emergency', icon: QrCode, label: t('emergency') },
+        { href: '/caretakers', icon: Users, label: t('caretakers') },
+        { href: '/profile', icon: User, label: t('profile') },
     ];
 
-    const isActive = (href: string) => pathname === href || pathname.startsWith(href + '/');
+    const handleLogout = () => {
+        logout();
+        router.push('/login');
+    };
 
     return (
         <aside className="sidebar">
-            {/* Logo */}
-            <div className="sidebar-logo">
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
-                    <JeevaloomLogo size={36} />
+            <div className="sidebar-header">
+                <div className="sidebar-logo">
+                    <span className="logo-icon">🌿</span>
                     <div>
-                        <div style={{ fontFamily: 'Plus Jakarta Sans, sans-serif', fontWeight: 800, fontSize: 16, color: '#f0f7ff', letterSpacing: '-0.3px' }}>
-                            Jeevaloom
-                        </div>
-                        <div style={{ fontSize: 10, fontWeight: 700, letterSpacing: 1.5, color: '#d97706', textTransform: 'uppercase' }}>
-                            {t('tagline')}
-                        </div>
+                        <h1 className="logo-title">Jeevaloom</h1>
+                        <p className="logo-subtitle">{t('tagline')}</p>
                     </div>
                 </div>
             </div>
 
-            {/* Nav */}
-            <nav style={{ padding: '12px 0', flex: 1 }}>
-                <div className="sidebar-section-label">Navigation</div>
-                {navItems.map(({ href, label, icon: Icon, activeClass }) => (
-                    <Link
-                        key={href}
-                        href={href}
-                        className={`sidebar-nav-item ${isActive(href) ? (activeClass || 'active') : ''}`}
-                    >
-                        <Icon size={17} strokeWidth={isActive(href) ? 2.2 : 1.8} />
-                        <span>{label}</span>
-                    </Link>
-                ))}
+            <nav className="sidebar-nav">
+                {navItems.map((item) => {
+                    const isActive = pathname === item.href || pathname.startsWith(item.href + '/');
+                    const Icon = item.icon;
+                    return (
+                        <Link key={item.href} href={item.href} className={`nav-item ${isActive ? 'active' : ''}`}>
+                            <Icon size={18} />
+                            <span>{item.label}</span>
+                        </Link>
+                    );
+                })}
             </nav>
 
-            {/* User info */}
-            <div style={{ borderTop: '1px solid #1a2d45', padding: '16px 16px' }}>
-                <div style={{ display: 'flex', alignItems: 'center', gap: 10, marginBottom: 12 }}>
-                    <div style={{
-                        width: 34, height: 34, borderRadius: '50%',
-                        background: 'linear-gradient(135deg, #16a34a, #1d4ed8)',
-                        display: 'flex', alignItems: 'center', justifyContent: 'center',
-                        fontSize: 13, fontWeight: 700, color: 'white', flexShrink: 0
-                    }}>
-                        {user?.name?.charAt(0)?.toUpperCase() || '?'}
-                    </div>
-                    <div style={{ overflow: 'hidden' }}>
-                        <div style={{ fontSize: 13, fontWeight: 600, color: '#f0f7ff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
-                            {user?.name || 'User'}
-                        </div>
-                        <div style={{ fontSize: 11, color: '#475569' }}>{user?.email}</div>
+            <div className="sidebar-footer">
+                <div className="user-info">
+                    <div className="user-avatar">{user?.name?.[0] || 'U'}</div>
+                    <div className="user-details">
+                        <span className="user-name">{user?.name || 'User'}</span>
+                        <span className="user-email">{user?.email || ''}</span>
                     </div>
                 </div>
-                <button className="btn-secondary" style={{ width: '100%', justifyContent: 'center', fontSize: 13, padding: '8px 12px' }} onClick={logout}>
-                    <LogOut size={15} />
-                    {t('logout')}
+                <button onClick={handleLogout} className="logout-btn">
+                    <LogOut size={16} />
+                    <span>{t('logout')}</span>
                 </button>
             </div>
         </aside>
