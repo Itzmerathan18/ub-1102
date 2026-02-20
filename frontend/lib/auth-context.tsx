@@ -4,8 +4,10 @@ import { useRouter } from 'next/navigation';
 
 interface User {
     id: string;
-    phone_number: string;
+    email: string;
+    name: string;
     role: string;
+    language: string;
 }
 
 interface AuthContextType {
@@ -27,8 +29,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
 
     useEffect(() => {
-        const storedToken = localStorage.getItem('ayuraksha_token');
-        const storedUser = localStorage.getItem('ayuraksha_user');
+        const storedToken = localStorage.getItem('jeevaloom_token');
+        const storedUser = localStorage.getItem('jeevaloom_user');
         if (storedToken && storedUser) {
             setToken(storedToken);
             setUser(JSON.parse(storedUser));
@@ -37,16 +39,16 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }, []);
 
     const login = (token: string, user: User) => {
-        localStorage.setItem('ayuraksha_token', token);
-        localStorage.setItem('ayuraksha_user', JSON.stringify(user));
+        localStorage.setItem('jeevaloom_token', token);
+        localStorage.setItem('jeevaloom_user', JSON.stringify(user));
         setToken(token);
         setUser(user);
         router.push('/dashboard');
     };
 
     const logout = () => {
-        localStorage.removeItem('ayuraksha_token');
-        localStorage.removeItem('ayuraksha_user');
+        localStorage.removeItem('jeevaloom_token');
+        localStorage.removeItem('jeevaloom_user');
         setToken(null);
         setUser(null);
         router.push('/login');

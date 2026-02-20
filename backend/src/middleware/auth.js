@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../lib/auth');
+const JWT_SECRET = process.env.JWT_SECRET || 'jeevaloom-secret';
 
 function authMiddleware(req, res, next) {
     const authHeader = req.headers.authorization;

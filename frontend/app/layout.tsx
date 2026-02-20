@@ -1,11 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import { AuthProvider } from "@/lib/auth-context";
-import Providers from "./providers";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "AyuRaksha LifeVault | AI-Powered Health Command Center",
-  description: "Your personal integrative health record system with AI-assisted analysis, emergency QR, and caretaker management.",
+  title: "Jeevaloom | Tradition Meets Science",
+  description: "Your integrative health platform combining Ayurveda and Modern Medicine with multilingual support.",
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -17,7 +16,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <Providers>
-          <AuthProvider>{children}</AuthProvider>
+          {children}
         </Providers>
       </body>
     </html>

@@ -1,5 +1,5 @@
-// This is your Prisma schema file
-// Using SQLite for local development (swap to postgresql for production)
+// Jeevaloom — Prisma Schema
+// SQLite for local dev
 
 generator client {
   provider = "prisma-client-js"
@@ -12,128 +12,92 @@ datasource db {
 
 model User {
   id           String   @id @default(uuid())
-  phoneNumber  String   @unique @map("phone_number")
-  email        String?
-  role         String   @default("patient") // patient / caretaker / admin
+  email        String   @unique
+  passwordHash String   @map("password_hash")
+  name         String   @default("User")
+  role         String   @default("patient")
+  language     String   @default("en")
   createdAt    DateTime @default(now()) @map("created_at")
 
-  healthProfile    HealthProfile?
-  emergencyContacts EmergencyContact[]
-  medications      Medication[]
-  medicalReports   MedicalReport[]
-  dosageProfile    DosageProfile?
-  healthAlerts     HealthAlert[]
-  emergencyAccess  EmergencyAccess?
-  caretakerOf      Caretaker[] @relation("CaretakerUser")
-  patients         Caretaker[] @relation("PatientUser")
+  healthProfile       HealthProfile?
+  ayurvedaAssessments AyurvedaAssessment[]
+  healthAssessments   HealthAssessment[]
+  prescriptions       Prescription[]
+  healthAlerts        HealthAlert[]
+  emergencyAccess     EmergencyAccess?
 
   @@map("users")
 }
 
 model HealthProfile {
-  id                 String   @id @default(uuid())
-  userId             String   @unique @map("user_id")
-  fullName           String   @map("full_name")
-  dob                String?
-  gender             String?
-  bloodGroup         String?  @map("blood_group")
-  heightCm           Float?   @map("height_cm")
-  weightKg           Float?   @map("weight_kg")
-  allergies          String   @default("[]") // JSON string
-  chronicConditions  String   @default("[]") @map("chronic_conditions") // JSON string
-  primaryDosha       String?  @map("primary_dosha")
-  doshaVata          Int      @default(33) @map("dosha_vata")
-  doshaPitta         Int      @default(33) @map("dosha_pitta")
-  doshaKapha         Int      @default(34) @map("dosha_kapha")
-  createdAt          DateTime @default(now()) @map("created_at")
+  id                String   @id @default(uuid())
+  userId            String   @unique @map("user_id")
+  fullName          String   @map("full_name")
+  dob               String?
+  gender            String?
+  bloodGroup        String?  @map("blood_group")
+  heightCm          Float?   @map("height_cm")
+  weightKg          Float?   @map("weight_kg")
+  allergies         String   @default("[]")
+  chronicConditions String   @default("[]") @map("chronic_conditions")
+  createdAt         DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("health_profiles")
 }
 
-model EmergencyContact {
-  id           String  @id @default(uuid())
-  userId       String  @map("user_id")
-  name         String
-  relation     String?
-  phoneNumbers String  @default("[]") @map("phone_numbers") // JSON string
-  emails       String  @default("[]") // JSON string
-  isPrimary    Boolean @default(false) @map("is_primary")
+model AyurvedaAssessment {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  answers   String   // JSON: { q1: "A", q2: "B", ... }
+  result    String   // "Vata" | "Pitta" | "Kapha" | "Vata-Pitta" etc.
+  vataScore Int      @default(0) @map("vata_score")
+  pittaScore Int     @default(0) @map("pitta_score")
+  kaphaScore Int     @default(0) @map("kapha_score")
+  createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("emergency_contacts")
+  @@map("ayurveda_assessments")
 }
 
-model Medication {
-  id               String   @id @default(uuid())
-  userId           String   @map("user_id")
-  medicineName     String   @map("medicine_name")
-  medicineSystem   String   @default("allopathy") @map("medicine_system")
-  medicineForm     String   @default("tablet") @map("medicine_form")
-  dosage           String?
-  dosageUnit       String?  @map("dosage_unit")
-  frequency        String?
-  timing           String   @default("[]") // JSON string
-  startDate        String?  @map("start_date")
-  endDate          String?  @map("end_date")
-  beforeDate       String?  @map("before_date")
-  afterDate        String?  @map("after_date")
-  prescribedBy     String?  @map("prescribed_by")
-  hospitalClinic   String?  @map("hospital_clinic")
-  purpose          String?
-  quantityRemaining Int?    @map("quantity_remaining")
-  isActive         Boolean  @default(true) @map("is_active")
-  createdAt        DateTime @default(now()) @map("created_at")
+model HealthAssessment {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  answers      String   // JSON: { age: "25-35", height: "170", weight: "70", ... }
+  bmi          Float?
+  riskScore    Int?     @map("risk_score")
+  riskLevel    String?  @map("risk_level") // low / moderate / high
+  createdAt    DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("medications")
+  @@map("health_assessments")
 }
 
-model MedicalReport {
-  id                  String   @id @default(uuid())
-  userId              String   @map("user_id")
-  reportName          String   @map("report_name")
-  reportType          String   @default("general") @map("report_type")
-  fileUrl             String?  @map("file_url")
-  reportDate          String?  @map("report_date")
-  hospitalLab         String?  @map("hospital_lab")
-  doctorName          String?  @map("doctor_name")
-  keyFindings         String?  @map("key_findings")
-  autoGeneratedSummary String? @map("auto_generated_summary")
-  isCritical          Boolean  @default(false) @map("is_critical")
-  createdAt           DateTime @default(now()) @map("created_at")
+model Prescription {
+  id        String   @id @default(uuid())
+  userId    String   @map("user_id")
+  type      String   // "ayurveda" | "english"
+  fileName  String   @map("file_name")
+  fileUrl   String   @map("file_url")
+  notes     String?
+  createdAt DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-  @@map("medical_reports")
-}
-
-model DosageProfile {
-  id                  String  @id @default(uuid())
-  userId              String  @unique @map("user_id")
-  ageGroup            String? @map("age_group")
-  bodySensitivity     String? @map("body_sensitivity")
-  stressLevel         String? @map("stress_level")
-  recommendedIntensity String? @map("recommended_intensity")
-  notes               String?
-
-  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@map("dosage_profiles")
+  @@map("prescriptions")
 }
 
 model HealthAlert {
   id          String   @id @default(uuid())
   userId      String   @map("user_id")
   alertType   String   @map("alert_type")
-  severity    String   @default("info") // info / warning / critical
+  severity    String   @default("info")
   title       String
   message     String
   isRead      Boolean  @default(false) @map("is_read")
-  isDismissed Boolean  @default(false) @map("is_dismissed")
   createdAt   DateTime @default(now()) @map("created_at")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -142,37 +106,13 @@ model HealthAlert {
 }
 
 model EmergencyAccess {
-  id                  String   @id @default(uuid())
-  userId              String   @unique @map("user_id")
-  accessToken         String   @unique @map("access_token")
-  isActive            Boolean  @default(true) @map("is_active")
-  showBloodGroup      Boolean  @default(true) @map("show_blood_group")
-  showAllergies       Boolean  @default(true) @map("show_allergies")
-  showChronicConditions Boolean @default(true) @map("show_chronic_conditions")
-  showMedications     Boolean  @default(true) @map("show_medications")
-  accessCount         Int      @default(0) @map("access_count")
-  lastAccessed        DateTime? @map("last_accessed")
+  id          String   @id @default(uuid())
+  userId      String   @unique @map("user_id")
+  accessToken String   @unique @map("access_token")
+  isActive    Boolean  @default(true) @map("is_active")
+  accessCount Int      @default(0) @map("access_count")
 
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("emergency_access")
-}
-
-model Caretaker {
-  id               String   @id @default(uuid())
-  patientId        String   @map("patient_id")
-  caretakerId      String   @map("caretaker_id")
-  relationship     String?
-  accessLevel      String   @default("view") @map("access_level")
-  canEditMedications Boolean @default(false) @map("can_edit_medications")
-  canUploadReports Boolean  @default(false) @map("can_upload_reports")
-  canEditProfile   Boolean  @default(false) @map("can_edit_profile")
-  status           String   @default("pending") // pending / accepted / rejected
-  invitedAt        DateTime @default(now()) @map("invited_at")
-  acceptedAt       DateTime? @map("accepted_at")
-
-  patient   User @relation("PatientUser", fields: [patientId], references: [id], onDelete: Cascade)
-  caretaker User @relation("CaretakerUser", fields: [caretakerId], references: [id], onDelete: Cascade)
-
-  @@map("caretakers")
 }
