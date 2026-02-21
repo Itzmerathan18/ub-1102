@@ -112,10 +112,9 @@ export default function LoginPage() {
                                 className="input-field"
                                 style={{ paddingLeft: 38 }}
                                 type="password"
-                                placeholder="••••••••"
+                                placeholder="Any password (optional)"
                                 value={password}
                                 onChange={e => setPassword(e.target.value)}
-                                required
                                 autoComplete="current-password"
                             />
                         </div>
