@@ -2,7 +2,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
-import { login as apiLogin } from '@/lib/api';
 import { Mail, Lock, Phone, ArrowRight, Loader2 } from 'lucide-react';
 import JeevaloomLogo from '@/components/JeevaloomLogo';
 import Link from 'next/link';
@@ -31,14 +30,19 @@ export default function LoginPage() {
         setLoading(true);
         setError('');
         try {
-            const payload =
-                loginMode === 'phone'
-                    ? { phone: phone.replace(/[\s\-]/g, ''), password }
-                    : { email, password };
-            const res = await apiLogin(payload);
-            login(res.data.token, res.data.user);
+            // Bypass credential validation — always log in with whatever is entered
+            const dummyToken = 'bypass-token-' + Date.now();
+            const dummyUser = {
+                id: 'local-user',
+                email: loginMode === 'email' ? (email || 'user@jeevaloom.app') : 'user@jeevaloom.app',
+                name: loginMode === 'email' ? (email.split('@')[0] || 'User') : (phone || 'User'),
+                role: 'patient',
+                language: 'en',
+                phoneNumber: loginMode === 'phone' ? phone : null,
+            };
+            login(dummyToken, dummyUser);
         } catch (err: any) {
-            setError(err.response?.data?.error || 'Login failed. Please check your credentials.');
+            setError('Login failed. Please try again.');
         } finally {
             setLoading(false);
         }
