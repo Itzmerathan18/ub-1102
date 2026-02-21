@@ -2,7 +2,7 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
-import { Mail, Lock, Phone, ArrowRight, Loader2 } from 'lucide-react';
+import { User, ArrowRight, Loader2 } from 'lucide-react';
 import { login as apiLogin } from '@/lib/api';
 import JeevaloomLogo from '@/components/JeevaloomLogo';
 import Link from 'next/link';
@@ -13,14 +13,12 @@ export default function LoginPage() {
     const router = useRouter();
     const { t, lang, setLang } = useLang();
 
-    // If already logged in, go straight to dashboard
     useEffect(() => {
         if (!isLoading && user) {
             router.replace('/dashboard');
         }
     }, [user, isLoading, router]);
     const [name, setName] = useState('');
-    const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
 
@@ -29,7 +27,7 @@ export default function LoginPage() {
         setLoading(true);
         setError('');
         try {
-            const res = await apiLogin({ name, password });
+            const res = await apiLogin({ name });
             login(res.data.token, res.data.user);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Login failed. Please try again.');
@@ -90,32 +88,17 @@ export default function LoginPage() {
 
                     <form onSubmit={handleLogin}>
                         <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('name')}</label>
-                        <div style={{ position: 'relative', marginBottom: 16 }}>
-                            <Mail size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
+                        <div style={{ position: 'relative', marginBottom: 20 }}>
+                            <User size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
                             <input
                                 className="input-field"
                                 style={{ paddingLeft: 38 }}
                                 type="text"
-                                placeholder="Your full name"
-                                contentEditable={true}
+                                placeholder="Enter your name"
                                 value={name}
                                 onChange={e => setName(e.target.value)}
                                 required
                                 autoComplete="name"
-                            />
-                        </div>
-
-                        <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('password')}</label>
-                        <div style={{ position: 'relative', marginBottom: 20 }}>
-                            <Lock size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
-                            <input
-                                className="input-field"
-                                style={{ paddingLeft: 38 }}
-                                type="password"
-                                placeholder="Any password (optional)"
-                                value={password}
-                                onChange={e => setPassword(e.target.value)}
-                                autoComplete="current-password"
                             />
                         </div>
 

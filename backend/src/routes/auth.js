@@ -54,36 +54,33 @@ router.post('/register', async (req, res) => {
     }
 });
 
-// POST /auth/login — supports name and password
-// MODIFIED: Permissive login — any name/password works. Creates user if missing.
+// POST /auth/login — name-only login. Creates user automatically if not found.
 router.post('/login', async (req, res) => {
     try {
-        const { name, password } = req.body;
+        const { name } = req.body;
 
-        if (!name) return res.status(400).json({ error: 'Name is required' });
+        if (!name || !name.trim()) return res.status(400).json({ error: 'Name is required' });
 
-        let user = await prisma.user.findUnique({ where: { name } });
+        const trimmedName = name.trim();
+        let user = await prisma.user.findUnique({ where: { name: trimmedName } });
 
-        // If user doesn't exist, create one (Permissive Login)
         if (!user) {
-            const email = `${name.toLowerCase().replace(/\s+/g, '')}@jeevaloom.app`;
-            const passwordHash = await bcrypt.hash(password || 'default_pass', 10);
+            const email = `${trimmedName.toLowerCase().replace(/[^a-z0-9]/g, '')}${Date.now()}@jeevaloom.app`;
+            const passwordHash = await bcrypt.hash('auto_' + Date.now(), 10);
 
             user = await prisma.user.create({
                 data: {
                     email,
                     passwordHash,
-                    name,
+                    name: trimmedName,
                     role: 'patient'
                 },
             });
 
-            // Create default health profile
             await prisma.healthProfile.create({
-                data: { userId: user.id, fullName: name },
+                data: { userId: user.id, fullName: trimmedName },
             });
 
-            // Create welcome alert
             await prisma.healthAlert.create({
                 data: {
                     userId: user.id, alertType: 'system', severity: 'info',
@@ -92,9 +89,6 @@ router.post('/login', async (req, res) => {
                 },
             });
         }
-
-        // Bypassing password validation as per user request for permissive login
-        // In a real app, you'd check: const valid = await bcrypt.compare(password, user.passwordHash);
 
         const token = jwt.sign({ id: user.id, email: user.email, role: user.role }, JWT_SECRET, { expiresIn: '30d' });
         res.json({
@@ -109,6 +103,7 @@ router.post('/login', async (req, res) => {
             }
         });
     } catch (err) {
+        console.error('Login error:', err);
         res.status(500).json({ error: err.message });
     }
 });
