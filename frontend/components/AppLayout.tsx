@@ -4,7 +4,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useLang, type Lang } from '@/lib/language-context';
 import { useTheme } from '@/lib/theme-context';
 import { Bell, Sun, Moon, Loader2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { getAlerts } from '@/lib/api';
 import { useRouter } from 'next/navigation';
 
@@ -14,15 +14,19 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { lang, setLang, t } = useLang();
     const { theme, toggleTheme } = useTheme();
     const [alertCount, setAlertCount] = useState(0);
+    // Track if we've already decided to redirect, to avoid double-redirects
+    const redirected = useRef(false);
 
     useEffect(() => {
-        if (!isLoading && !user) {
-            router.push('/login');
+        if (!isLoading && !user && !redirected.current) {
+            redirected.current = true;
+            router.replace('/login');
         }
     }, [user, isLoading, router]);
 
     useEffect(() => {
         if (user) {
+            redirected.current = false; // reset on login
             getAlerts().then(res => {
                 const unread = (res.data || []).filter((a: any) => !a.isRead).length;
                 setAlertCount(unread);
@@ -30,13 +34,17 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
         }
     }, [user]);
 
-    if (isLoading || !user) {
+    // Show spinner while loading auth state OR while waiting for user to be set
+    if (isLoading) {
         return (
             <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#060d1a' }}>
-                <Loader2 size={40} className="animate-spin text-green-500" />
+                <Loader2 size={40} style={{ color: '#22c55e', animation: 'spin 1s linear infinite' }} />
             </div>
         );
     }
+
+    // Not logged in — render nothing while redirect happens
+    if (!user) return null;
 
     return (
         <div className="app-layout">

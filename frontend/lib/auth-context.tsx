@@ -8,6 +8,7 @@ interface User {
     name: string;
     role: string;
     language: string;
+    phoneNumber?: string | null;
 }
 
 interface AuthContextType {
@@ -28,22 +29,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const [isLoading, setIsLoading] = useState(true);
     const router = useRouter();
 
+    // Restore session from localStorage on mount
     useEffect(() => {
-        const storedToken = localStorage.getItem('jeevaloom_token');
-        const storedUser = localStorage.getItem('jeevaloom_user');
-        if (storedToken && storedUser) {
-            setToken(storedToken);
-            setUser(JSON.parse(storedUser));
+        try {
+            const storedToken = localStorage.getItem('jeevaloom_token');
+            const storedUser = localStorage.getItem('jeevaloom_user');
+            if (storedToken && storedUser) {
+                setToken(storedToken);
+                setUser(JSON.parse(storedUser));
+            }
+        } catch {
+            // Corrupted storage — clear it
+            localStorage.removeItem('jeevaloom_token');
+            localStorage.removeItem('jeevaloom_user');
+        } finally {
+            setIsLoading(false);
         }
-        setIsLoading(false);
     }, []);
 
-    const login = (token: string, user: User) => {
-        localStorage.setItem('jeevaloom_token', token);
-        localStorage.setItem('jeevaloom_user', JSON.stringify(user));
-        setToken(token);
-        setUser(user);
-        router.push('/dashboard');
+    const login = (newToken: string, newUser: User) => {
+        // Persist first, then set state, then navigate
+        localStorage.setItem('jeevaloom_token', newToken);
+        localStorage.setItem('jeevaloom_user', JSON.stringify(newUser));
+        setToken(newToken);
+        setUser(newUser);
+        // Use replace so back button doesn't return to login
+        router.replace('/dashboard');
     };
 
     const logout = () => {
@@ -51,7 +62,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         localStorage.removeItem('jeevaloom_user');
         setToken(null);
         setUser(null);
-        router.push('/login');
+        router.replace('/login');
     };
 
     return (

@@ -1,15 +1,24 @@
 'use client';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
 import { login as apiLogin } from '@/lib/api';
-import { Mail, Lock, Phone, ArrowRight } from 'lucide-react';
+import { Mail, Lock, Phone, ArrowRight, Loader2 } from 'lucide-react';
 import JeevaloomLogo from '@/components/JeevaloomLogo';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 
 export default function LoginPage() {
-    const { login } = useAuth();
+    const { login, user, isLoading } = useAuth();
+    const router = useRouter();
     const { t, lang, setLang } = useLang();
+
+    // If already logged in, go straight to dashboard
+    useEffect(() => {
+        if (!isLoading && user) {
+            router.replace('/dashboard');
+        }
+    }, [user, isLoading, router]);
     const [loginMode, setLoginMode] = useState<'email' | 'phone'>('email');
     const [email, setEmail] = useState('');
     const [phone, setPhone] = useState('');
@@ -33,6 +42,15 @@ export default function LoginPage() {
         } finally {
             setLoading(false);
         }
+    }
+
+    // Show spinner while checking auth or if already logged in (redirecting)
+    if (isLoading || user) {
+        return (
+            <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center', background: '#060d1a' }}>
+                <Loader2 size={40} style={{ color: '#22c55e', animation: 'spin 1s linear infinite' }} />
+            </div>
+        );
     }
 
     return (
