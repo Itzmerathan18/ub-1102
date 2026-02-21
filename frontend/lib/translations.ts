@@ -27,6 +27,11 @@ export const translations: Record<Lang, Record<string, string>> = {
         have_account: 'Already have an account?',
         tagline: 'Tradition Meets Science',
         subtitle: 'Your integrative health platform',
+        mobile_number: 'Mobile Number',
+        login_with_email: 'Login with Email',
+        login_with_phone: 'Login with Mobile',
+        phone_placeholder: '+91 9876543210',
+        or: 'or',
 
         // Dashboard
         welcome: 'Welcome back',
@@ -187,6 +192,11 @@ export const translations: Record<Lang, Record<string, string>> = {
         have_account: 'पहले से खाता है?',
         tagline: 'परंपरा विज्ञान से मिलती है',
         subtitle: 'आपका एकीकृत स्वास्थ्य मंच',
+        mobile_number: 'मोबाइल नंबर',
+        login_with_email: 'ईमेल से लॉगिन',
+        login_with_phone: 'मोबाइल से लॉगिन',
+        phone_placeholder: '+91 9876543210',
+        or: 'या',
 
         welcome: 'वापसी पर स्वागत',
         start_ayurveda: 'आयुर्वेद मूल्यांकन शुरू करें',
@@ -334,6 +344,11 @@ export const translations: Record<Lang, Record<string, string>> = {
         have_account: 'ಈಗಾಗಲೇ ಖಾತೆ ಇದೆಯೇ?',
         tagline: 'ಸಂಪ್ರದಾಯ ವಿಜ್ಞಾನವನ್ನು ಭೇಟಿ ಮಾಡುತ್ತದೆ',
         subtitle: 'ನಿಮ್ಮ ಸಮಗ್ರ ಆರೋಗ್ಯ ವೇದಿಕೆ',
+        mobile_number: 'ಮೊಬೈಲ್ ಸಂಖ್ಯೆ',
+        login_with_email: 'ಇಮೇಲ್‌ನಿಂದ ಲಾಗಿನ್',
+        login_with_phone: 'ಮೊಬೈಲ್‌ನಿಂದ ಲಾಗಿನ್',
+        phone_placeholder: '+91 9876543210',
+        or: 'ಅಥವಾ',
 
         welcome: 'ಮರಳಿ ಸ್ವಾಗತ',
         start_ayurveda: 'ಆಯುರ್ವೇದ ಮೌಲ್ಯಮಾಪನ ಪ್ರಾರಂಭಿಸಿ',

@@ -9,8 +9,8 @@ API.interceptors.request.use((config) => {
 });
 
 // Auth
-export const register = (data: { email: string; password: string; name: string }) => API.post('/auth/register', data);
-export const login = (data: { email: string; password: string }) => API.post('/auth/login', data);
+export const register = (data: { email: string; password: string; name: string; phoneNumber?: string }) => API.post('/auth/register', data);
+export const login = (data: { email?: string; phone?: string; password: string }) => API.post('/auth/login', data);
 export const updateLanguage = (language: string) => API.put('/auth/language', { language });
 
 // Profile

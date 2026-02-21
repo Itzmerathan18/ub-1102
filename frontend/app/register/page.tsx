@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
 import { register as apiRegister } from '@/lib/api';
-import { Mail, Lock, User, ArrowRight, Loader2 } from 'lucide-react';
+import { Mail, Lock, User, Phone, ArrowRight } from 'lucide-react';
 import JeevaloomLogo from '@/components/JeevaloomLogo';
 import Link from 'next/link';
 
@@ -12,6 +12,7 @@ export default function RegisterPage() {
     const { t, lang, setLang } = useLang();
     const [name, setName] = useState('');
     const [email, setEmail] = useState('');
+    const [phone, setPhone] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -20,7 +21,8 @@ export default function RegisterPage() {
         e.preventDefault();
         setLoading(true); setError('');
         try {
-            const res = await apiRegister({ name, email, password });
+            const normalized = phone.replace(/[\s\-]/g, '');
+            const res = await apiRegister({ name, email, password, ...(normalized ? { phoneNumber: normalized } : {}) });
             login(res.data.token, res.data.user);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Registration failed');
@@ -77,10 +79,16 @@ export default function RegisterPage() {
                             <input className="input-field" style={{ paddingLeft: 38 }} type="email" placeholder="you@example.com" value={email} onChange={e => setEmail(e.target.value)} required />
                         </div>
 
+                        <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('mobile_number')} <span style={{ color: '#4a6480', fontWeight: 400 }}>(optional)</span></label>
+                        <div style={{ position: 'relative', marginBottom: 16 }}>
+                            <Phone size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
+                            <input className="input-field" style={{ paddingLeft: 38 }} type="tel" placeholder={t('phone_placeholder')} value={phone} onChange={e => setPhone(e.target.value)} autoComplete="tel" />
+                        </div>
+
                         <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('password')}</label>
                         <div style={{ position: 'relative', marginBottom: 20 }}>
                             <Lock size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
-                            <input className="input-field" style={{ paddingLeft: 38 }} type="password" placeholder="Min 6 characters" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} />
+                            <input className="input-field" style={{ paddingLeft: 38 }} type="password" placeholder="Min 6 characters" value={password} onChange={e => setPassword(e.target.value)} required minLength={6} autoComplete="new-password" />
                         </div>
 
                         {error && <div style={{ background: 'rgba(244,63,94,0.1)', border: '1px solid rgba(244,63,94,0.3)', borderRadius: 8, padding: '10px 14px', fontSize: 13, color: '#f43f5e', marginBottom: 16 }}>{error}</div>}
