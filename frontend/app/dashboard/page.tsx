@@ -7,8 +7,11 @@ import { useEffect, useState } from 'react';
 import { getAyurvedaHistory, getHealthHistory, getMedications, getAlerts, getProfile } from '@/lib/api';
 import Link from 'next/link';
 import { Leaf, Stethoscope, Pill, FolderHeart, QrCode, Users, Activity, Droplets, Heart, AlertTriangle, CheckCircle, X } from 'lucide-react';
+import { Suspense } from 'react';
 
-export default function Dashboard() {
+export const dynamic = 'force-dynamic';
+
+function DashboardContent() {
     const { user } = useAuth();
     const { t } = useLang();
     const searchParams = useSearchParams();
@@ -201,5 +204,13 @@ export default function Dashboard() {
                 </div>
             </div>
         </AppLayout>
+    );
+}
+
+export default function Dashboard() {
+    return (
+        <Suspense fallback={<div style={{ display: 'flex', justifyContent: 'center', padding: 100 }}><div className="spinner" /></div>}>
+            <DashboardContent />
+        </Suspense>
     );
 }
