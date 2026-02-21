@@ -22,8 +22,22 @@ router.get('/:token', async (req, res) => {
         });
 
         const profile = access.user.healthProfile;
+
+        let age = null;
+        if (profile?.dob) {
+            const birthDate = new Date(profile.dob);
+            const today = new Date();
+            age = today.getFullYear() - birthDate.getFullYear();
+            const m = today.getMonth() - birthDate.getMonth();
+            if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+        }
+
         const data = {
             name: profile?.fullName,
+            age,
+            gender: profile?.gender,
             bloodGroup: access.showBloodGroup ? profile?.bloodGroup : null,
             allergies: access.showAllergies ? JSON.parse(profile?.allergies || '[]') : null,
             chronicConditions: access.showChronicConditions ? JSON.parse(profile?.chronicConditions || '[]') : null,

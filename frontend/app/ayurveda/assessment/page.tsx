@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import AppLayout from '@/components/AppLayout';
 import { useLang } from '@/lib/language-context';
 import { ArrowRight, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import { saveAyurvedaAssessment } from '@/lib/api';
 
 const doshaQuestions = [
     { q: 'My body frame is:', a: 'Thin and lean', b: 'Medium, well-proportioned', c: 'Large and broad' },
@@ -28,12 +29,14 @@ export default function AyurvedaAssessmentPage() {
     const router = useRouter();
     const [current, setCurrent] = useState(0);
     const [answers, setAnswers] = useState<Record<number, 'a' | 'b' | 'c'>>({});
+    const [loading, setLoading] = useState(false);
 
     const handleSelect = (option: 'a' | 'b' | 'c') => {
         setAnswers(prev => ({ ...prev, [current]: option }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        setLoading(true);
         let vata = 0, pitta = 0, kapha = 0;
         Object.values(answers).forEach(val => {
             if (val === 'a') vata++;
@@ -41,30 +44,36 @@ export default function AyurvedaAssessmentPage() {
             else kapha++;
         });
 
-        const scores = { vata, pitta, kapha };
-        let result = 'Vata';
-        if (pitta >= vata && pitta >= kapha) result = 'Pitta';
-        else if (kapha >= vata && kapha >= pitta) result = 'Kapha';
-        else if (vata >= pitta && vata >= kapha) result = 'Vata';
+        const vataScore = Math.round((vata / doshaQuestions.length) * 100);
+        const pittaScore = Math.round((pitta / doshaQuestions.length) * 100);
+        const kaphaScore = Math.round((kapha / doshaQuestions.length) * 100);
 
-        // Check dual types
+        let result = 'Vata';
         const max = Math.max(vata, pitta, kapha);
         const types: string[] = [];
         if (vata === max) types.push('Vata');
         if (pitta === max) types.push('Pitta');
         if (kapha === max) types.push('Kapha');
-        if (types.length > 1) result = types.join('-');
+        result = types.join('-');
 
-        const data = JSON.stringify({
-            answers,
-            result,
-            vataScore: Math.round((vata / 15) * 100),
-            pittaScore: Math.round((pitta / 15) * 100),
-            kaphaScore: Math.round((kapha / 15) * 100),
-        });
-
-        sessionStorage.setItem('ayurveda_result', data);
-        router.push('/ayurveda/result');
+        try {
+            await saveAyurvedaAssessment({
+                answers,
+                result,
+                vataScore,
+                pittaScore,
+                kaphaScore,
+            });
+            router.push('/dashboard?assessment_saved=true');
+        } catch (err) {
+            console.error('Failed to save assessment', err);
+            // Fallback
+            const data = JSON.stringify({ answers, result, vataScore, pittaScore, kaphaScore });
+            sessionStorage.setItem('ayurveda_result', data);
+            router.push('/ayurveda/result');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const q = doshaQuestions[current];
@@ -126,8 +135,8 @@ export default function AyurvedaAssessmentPage() {
                         <button
                             className="btn-primary"
                             onClick={() => setCurrent(current + 1)}
-                            disabled={answers[current] === undefined}
-                            style={{ opacity: answers[current] === undefined ? 0.5 : 1 }}
+                            disabled={!answers[current]}
+                            style={{ opacity: !answers[current] ? 0.5 : 1 }}
                         >
                             {t('next')} <ArrowRight size={15} />
                         </button>
@@ -135,10 +144,10 @@ export default function AyurvedaAssessmentPage() {
                         <button
                             className="btn-primary"
                             onClick={handleSubmit}
-                            disabled={Object.keys(answers).length < doshaQuestions.length}
-                            style={{ opacity: Object.keys(answers).length < doshaQuestions.length ? 0.5 : 1 }}
+                            disabled={loading || Object.keys(answers).length < doshaQuestions.length}
+                            style={{ opacity: (loading || Object.keys(answers).length < doshaQuestions.length) ? 0.5 : 1 }}
                         >
-                            {t('submit')} <CheckCircle2 size={15} />
+                            {loading ? <span className="spinner" /> : <>{t('submit')} <CheckCircle2 size={15} /></>}
                         </button>
                     )}
                 </div>

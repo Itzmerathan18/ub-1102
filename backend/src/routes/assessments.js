@@ -18,6 +18,14 @@ router.post('/ayurveda', authMiddleware, async (req, res) => {
                 kaphaScore: kaphaScore || 0,
             },
         });
+
+        // Update profile
+        await prisma.healthProfile.upsert({
+            where: { userId: req.user.id },
+            update: { primaryDosha: result, doshaVata: vataScore, doshaPitta: pittaScore, doshaKapha: kaphaScore },
+            create: { userId: req.user.id, fullName: req.user.name || 'User', primaryDosha: result, doshaVata: vataScore, doshaPitta: pittaScore, doshaKapha: kaphaScore },
+        });
+
         res.json(record);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -60,6 +68,25 @@ router.post('/health', authMiddleware, async (req, res) => {
                 riskLevel: riskLevel || null,
             },
         });
+
+        // Update profile height/weight if provided (answers[1] and answers[2])
+        const height = parseFloat(answers[1]);
+        const weight = parseFloat(answers[2]);
+
+        await prisma.healthProfile.upsert({
+            where: { userId: req.user.id },
+            update: {
+                ...(height ? { heightCm: height } : {}),
+                ...(weight ? { weightKg: weight } : {}),
+            },
+            create: {
+                userId: req.user.id,
+                fullName: req.user.name || 'User',
+                ...(height ? { heightCm: height } : {}),
+                ...(weight ? { weightKg: weight } : {}),
+            },
+        });
+
         res.json(record);
     } catch (err) {
         res.status(500).json({ error: err.message });

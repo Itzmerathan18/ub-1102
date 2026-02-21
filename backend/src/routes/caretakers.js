@@ -9,9 +9,16 @@ router.post('/invite', authMiddleware, async (req, res) => {
     try {
         const { caretakerEmail, relationship, canEditMedications, canUploadReports, canEditProfile } = req.body;
 
-        let caretakerUser = await prisma.user.findUnique({ where: { email: caretakerEmail } });
+        let caretakerUser = await prisma.user.findFirst({
+            where: {
+                OR: [
+                    { email: caretakerEmail },
+                    { name: caretakerEmail }, // Allow inviting by name too
+                ],
+            },
+        });
         if (!caretakerUser) {
-            return res.status(404).json({ error: 'No user found with that email. They must register first.' });
+            return res.status(404).json({ error: 'No user found with that name/email. They must register first.' });
         }
 
         const existing = await prisma.caretaker.findFirst({
@@ -41,9 +48,22 @@ router.get('/', authMiddleware, async (req, res) => {
     try {
         const caretakers = await prisma.caretaker.findMany({
             where: { patientId: req.user.id },
-            include: { caretaker: { select: { email: true, name: true } } },
+            include: { caretaker: { select: { id: true, email: true, name: true } } },
         });
         res.json(caretakers);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+});
+
+// GET /caretakers/patients — people I am taking care of
+router.get('/patients', authMiddleware, async (req, res) => {
+    try {
+        const patients = await prisma.caretaker.findMany({
+            where: { caretakerId: req.user.id },
+            include: { patient: { select: { id: true, email: true, name: true } } },
+        });
+        res.json(patients);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }

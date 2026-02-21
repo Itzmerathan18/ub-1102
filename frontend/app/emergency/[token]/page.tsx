@@ -27,6 +27,13 @@ export default function EmergencyViewPage() {
                 <span style={{ fontSize: 40 }}>🚨</span>
                 <h1 style={{ fontSize: 24, fontWeight: 800, fontFamily: "'Plus Jakarta Sans', sans-serif", marginTop: 8 }}>Emergency Health Info</h1>
                 {data?.name && <p style={{ fontSize: 18, color: 'var(--green-light)', fontWeight: 600, marginTop: 4 }}>{data.name}</p>}
+                {(data?.age || data?.gender) && (
+                    <div style={{ fontSize: 14, color: 'var(--text-secondary)', marginTop: 4 }}>
+                        {data.age && <span>{data.age} yrs</span>}
+                        {data.age && data.gender && <span> • </span>}
+                        {data.gender && <span>{data.gender}</span>}
+                    </div>
+                )}
             </div>
 
             {data?.bloodGroup && (

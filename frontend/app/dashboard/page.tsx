@@ -2,17 +2,26 @@
 import AppLayout from '@/components/AppLayout';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { getAyurvedaHistory, getHealthHistory, getMedications, getAlerts, getProfile } from '@/lib/api';
 import Link from 'next/link';
-import { Leaf, Stethoscope, Pill, FolderHeart, QrCode, Users, Activity, Droplets, Heart, AlertTriangle } from 'lucide-react';
+import { Leaf, Stethoscope, Pill, FolderHeart, QrCode, Users, Activity, Droplets, Heart, AlertTriangle, CheckCircle, X } from 'lucide-react';
 
 export default function Dashboard() {
     const { user } = useAuth();
     const { t } = useLang();
+    const searchParams = useSearchParams();
     const [stats, setStats] = useState({ assessments: 0, meds: 0, alerts: 0 });
     const [profile, setProfile] = useState<any>(null);
     const [recentActivity, setRecentActivity] = useState<any[]>([]);
+    const [showSuccess, setShowSuccess] = useState(false);
+
+    useEffect(() => {
+        if (searchParams.get('assessment_saved') === 'true') {
+            setShowSuccess(true);
+        }
+    }, [searchParams]);
 
     useEffect(() => {
         Promise.allSettled([
@@ -66,10 +75,36 @@ export default function Dashboard() {
     return (
         <AppLayout>
             <div className="animate-in">
+                {/* Success Popup */}
+                {showSuccess && (
+                    <div className="glass-card" style={{
+                        position: 'fixed', top: 24, right: 24, zIndex: 1000, width: 320,
+                        padding: '16px 20px', borderLeft: '4px solid #22c55e',
+                        display: 'flex', alignItems: 'center', gap: 14,
+                        animation: 'slideInRight 0.3s ease-out'
+                    }}>
+                        <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(34,197,94,0.15)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+                            <CheckCircle size={18} color="#22c55e" />
+                        </div>
+                        <div style={{ flex: 1 }}>
+                            <div style={{ fontWeight: 700, fontSize: 14, color: '#f0f7ff' }}>Success!</div>
+                            <div style={{ fontSize: 13, color: '#94aec8' }}>Your assessment has been saved.</div>
+                        </div>
+                        <button onClick={() => setShowSuccess(false)} style={{ background: 'none', border: 'none', color: '#4a6480', cursor: 'pointer', padding: 4 }}>
+                            <X size={16} />
+                        </button>
+                    </div>
+                )}
+
                 {/* Welcome */}
-                <div className="page-header">
-                    <h1>{t('welcome')}, <span className="gradient-text-green">{user?.name || 'User'}</span> 👋</h1>
-                    <p>{t('subtitle')}</p>
+                <div className="page-header" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end' }}>
+                    <div>
+                        <h1>{t('welcome')}, <span className="gradient-text-green">{user?.name || 'User'}</span> 👋</h1>
+                        <p>{t('subtitle')}</p>
+                    </div>
+                    <Link href="/profile" className="btn-secondary" style={{ padding: '8px 16px', fontSize: 13 }}>
+                        Settings
+                    </Link>
                 </div>
 
                 {/* Stats Row */}

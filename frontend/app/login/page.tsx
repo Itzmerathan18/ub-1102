@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { useLang } from '@/lib/language-context';
 import { Mail, Lock, Phone, ArrowRight, Loader2 } from 'lucide-react';
+import { login as apiLogin } from '@/lib/api';
 import JeevaloomLogo from '@/components/JeevaloomLogo';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -18,9 +19,7 @@ export default function LoginPage() {
             router.replace('/dashboard');
         }
     }, [user, isLoading, router]);
-    const [loginMode, setLoginMode] = useState<'email' | 'phone'>('email');
-    const [email, setEmail] = useState('');
-    const [phone, setPhone] = useState('');
+    const [name, setName] = useState('');
     const [password, setPassword] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -30,19 +29,10 @@ export default function LoginPage() {
         setLoading(true);
         setError('');
         try {
-            // Bypass credential validation — always log in with whatever is entered
-            const dummyToken = 'bypass-token-' + Date.now();
-            const dummyUser = {
-                id: 'local-user',
-                email: loginMode === 'email' ? (email || 'user@jeevaloom.app') : 'user@jeevaloom.app',
-                name: loginMode === 'email' ? (email.split('@')[0] || 'User') : (phone || 'User'),
-                role: 'patient',
-                language: 'en',
-                phoneNumber: loginMode === 'phone' ? phone : null,
-            };
-            login(dummyToken, dummyUser);
+            const res = await apiLogin({ name, password });
+            login(res.data.token, res.data.user);
         } catch (err: any) {
-            setError('Login failed. Please try again.');
+            setError(err.response?.data?.error || 'Login failed. Please try again.');
         } finally {
             setLoading(false);
         }
@@ -98,70 +88,22 @@ export default function LoginPage() {
                         {t('no_account')} <Link href="/register" style={{ color: '#22c55e', fontWeight: 600, textDecoration: 'none' }}>{t('sign_up')}</Link>
                     </p>
 
-                    {/* Email / Phone toggle */}
-                    <div style={{ display: 'flex', gap: 8, marginBottom: 20, background: 'rgba(255,255,255,0.04)', borderRadius: 10, padding: 4 }}>
-                        <button
-                            type="button"
-                            onClick={() => { setLoginMode('email'); setError(''); }}
-                            style={{
-                                flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'all 0.2s',
-                                background: loginMode === 'email' ? 'rgba(34,197,94,0.15)' : 'transparent',
-                                color: loginMode === 'email' ? '#22c55e' : '#4a6480',
-                            }}
-                        >
-                            <Mail size={13} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
-                            {t('login_with_email')}
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => { setLoginMode('phone'); setError(''); }}
-                            style={{
-                                flex: 1, padding: '8px 0', borderRadius: 8, border: 'none', cursor: 'pointer', fontSize: 13, fontWeight: 600, transition: 'all 0.2s',
-                                background: loginMode === 'phone' ? 'rgba(34,197,94,0.15)' : 'transparent',
-                                color: loginMode === 'phone' ? '#22c55e' : '#4a6480',
-                            }}
-                        >
-                            <Phone size={13} style={{ display: 'inline', marginRight: 6, verticalAlign: 'middle' }} />
-                            {t('login_with_phone')}
-                        </button>
-                    </div>
-
                     <form onSubmit={handleLogin}>
-                        {loginMode === 'email' ? (
-                            <>
-                                <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('email')}</label>
-                                <div style={{ position: 'relative', marginBottom: 16 }}>
-                                    <Mail size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
-                                    <input
-                                        className="input-field"
-                                        style={{ paddingLeft: 38 }}
-                                        type="email"
-                                        placeholder="you@example.com"
-                                        value={email}
-                                        onChange={e => setEmail(e.target.value)}
-                                        required
-                                        autoComplete="email"
-                                    />
-                                </div>
-                            </>
-                        ) : (
-                            <>
-                                <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('mobile_number')}</label>
-                                <div style={{ position: 'relative', marginBottom: 16 }}>
-                                    <Phone size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
-                                    <input
-                                        className="input-field"
-                                        style={{ paddingLeft: 38 }}
-                                        type="tel"
-                                        placeholder={t('phone_placeholder')}
-                                        value={phone}
-                                        onChange={e => setPhone(e.target.value)}
-                                        required
-                                        autoComplete="tel"
-                                    />
-                                </div>
-                            </>
-                        )}
+                        <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('name')}</label>
+                        <div style={{ position: 'relative', marginBottom: 16 }}>
+                            <Mail size={15} style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)', color: '#4a6480' }} />
+                            <input
+                                className="input-field"
+                                style={{ paddingLeft: 38 }}
+                                type="text"
+                                placeholder="Your full name"
+                                contentEditable={true}
+                                value={name}
+                                onChange={e => setName(e.target.value)}
+                                required
+                                autoComplete="name"
+                            />
+                        </div>
 
                         <label style={{ fontSize: 13, fontWeight: 500, color: '#94aec8', display: 'block', marginBottom: 6 }}>{t('password')}</label>
                         <div style={{ position: 'relative', marginBottom: 20 }}>

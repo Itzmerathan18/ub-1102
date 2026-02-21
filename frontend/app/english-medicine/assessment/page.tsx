@@ -23,20 +23,26 @@ const healthQuestions = [
     { q: 'Are you currently taking any medications?', options: ['None', '1-2 medications', '3-5 medications', 'More than 5'] },
 ];
 
+import { saveHealthAssessment } from '@/lib/api';
+
 export default function HealthAssessmentPage() {
     const { t } = useLang();
     const router = useRouter();
     const [current, setCurrent] = useState(0);
     const [answers, setAnswers] = useState<Record<number, string>>({});
+    const [loading, setLoading] = useState(false);
 
     const handleSelect = (value: string) => {
         setAnswers(prev => ({ ...prev, [current]: value }));
     };
 
-    const handleSubmit = () => {
+    const handleSubmit = async () => {
+        setLoading(true);
         // Calculate BMI
-        const height = parseFloat(answers[1]) / 100; // cm to m
-        const weight = parseFloat(answers[2]);
+        const heightVal = parseFloat(answers[1]) || 0;
+        const weightVal = parseFloat(answers[2]) || 0;
+        const height = heightVal / 100; // cm to m
+        const weight = weightVal;
         const bmi = height > 0 ? weight / (height * height) : 0;
 
         // Risk scoring
@@ -85,15 +91,28 @@ export default function HealthAssessmentPage() {
         const riskScore = Math.min(Math.round((risk / maxRisk) * 100), 100);
         const riskLevel = riskScore <= 25 ? 'low' : riskScore <= 55 ? 'moderate' : 'high';
 
-        const data = JSON.stringify({
-            answers,
-            bmi: Math.round(bmi * 10) / 10,
-            riskScore,
-            riskLevel,
-        });
-
-        sessionStorage.setItem('health_result', data);
-        router.push('/english-medicine/result');
+        try {
+            await saveHealthAssessment({
+                answers,
+                bmi: Math.round(bmi * 10) / 10,
+                riskScore,
+                riskLevel,
+            });
+            router.push('/dashboard?assessment_saved=true');
+        } catch (err) {
+            console.error('Failed to save assessment', err);
+            // Fallback
+            const data = JSON.stringify({
+                answers,
+                bmi: Math.round(bmi * 10) / 10,
+                riskScore,
+                riskLevel,
+            });
+            sessionStorage.setItem('health_result', data);
+            router.push('/english-medicine/result');
+        } finally {
+            setLoading(false);
+        }
     };
 
     const q = healthQuestions[current];
@@ -168,10 +187,10 @@ export default function HealthAssessmentPage() {
                         <button
                             className="btn-blue"
                             onClick={handleSubmit}
-                            disabled={Object.keys(answers).length < healthQuestions.length}
-                            style={{ opacity: Object.keys(answers).length < healthQuestions.length ? 0.5 : 1 }}
+                            disabled={loading || Object.keys(answers).length < healthQuestions.length}
+                            style={{ opacity: (loading || Object.keys(answers).length < healthQuestions.length) ? 0.5 : 1 }}
                         >
-                            {t('submit')} <CheckCircle2 size={15} />
+                            {loading ? <span className="spinner" /> : <>{t('submit')} <CheckCircle2 size={15} /></>}
                         </button>
                     )}
                 </div>

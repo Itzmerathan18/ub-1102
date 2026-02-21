@@ -21,8 +21,8 @@ export default function RegisterPage() {
         e.preventDefault();
         setLoading(true); setError('');
         try {
-            const normalized = phone.replace(/[\s\-]/g, '');
-            const res = await apiRegister({ name, email, password, ...(normalized ? { phoneNumber: normalized } : {}) });
+            const normalized = phone ? phone.replace(/[\s\-]/g, '') : undefined;
+            const res = await apiRegister({ name, email: email || undefined, password, phoneNumber: normalized });
             login(res.data.token, res.data.user);
         } catch (err: any) {
             setError(err.response?.data?.error || 'Registration failed');

@@ -3,10 +3,11 @@ import Sidebar from '@/components/Sidebar';
 import { useAuth } from '@/lib/auth-context';
 import { useLang, type Lang } from '@/lib/language-context';
 import { useTheme } from '@/lib/theme-context';
-import { Bell, Sun, Moon, Loader2 } from 'lucide-react';
+import { Bell, Sun, Moon, Loader2, User } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { getAlerts } from '@/lib/api';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 export default function AppLayout({ children }: { children: React.ReactNode }) {
     const { user, isLoading } = useAuth();
@@ -76,6 +77,15 @@ export default function AppLayout({ children }: { children: React.ReactNode }) {
                             <Bell size={18} />
                             {alertCount > 0 && <span className="alert-badge">{alertCount}</span>}
                         </a>
+
+                        {/* Profile Link */}
+                        <Link href="/profile" className="profile-icon-link" style={{
+                            width: 34, height: 34, borderRadius: '50%', background: 'rgba(34,197,94,0.1)',
+                            display: 'flex', alignItems: 'center', justifyContent: 'center', border: '1px solid rgba(34,197,94,0.2)',
+                            color: '#22c55e', marginLeft: 8
+                        }}>
+                            <User size={18} />
+                        </Link>
                     </div>
                 </header>
                 <main className="main-content">

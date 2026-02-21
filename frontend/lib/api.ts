@@ -9,8 +9,8 @@ API.interceptors.request.use((config) => {
 });
 
 // Auth
-export const register = (data: { email: string; password: string; name: string; phoneNumber?: string }) => API.post('/auth/register', data);
-export const login = (data: { email?: string; phone?: string; password: string }) => API.post('/auth/login', data);
+export const register = (data: { email?: string; password: string; name: string; phoneNumber?: string }) => API.post('/auth/register', data);
+export const login = (data: { name: string; password: string }) => API.post('/auth/login', data);
 export const updateLanguage = (language: string) => API.put('/auth/language', { language });
 
 // Profile
@@ -57,6 +57,7 @@ export const dismissAlert = (id: string) => API.delete(`/alerts/${id}`);
 
 // Caretakers
 export const getCaretakers = () => API.get('/caretakers');
+export const getPatients = () => API.get('/caretakers/patients');
 export const inviteCaretaker = (data: any) => API.post('/caretakers/invite', data);
 export const approveCaretaker = (id: string) => API.put(`/caretakers/${id}/approve`);
 export const removeCaretaker = (id: string) => API.delete(`/caretakers/${id}`);
